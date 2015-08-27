@@ -1,0 +1,64 @@
+if has('vim_starting')
+	set nocompatible
+  	if !isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
+		:call system("git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim")
+	endif
+	set runtimepath+=~/.vim/bundle/neobundle.vim/
+endif
+
+call neobundle#begin(expand('~/.vim/bundle/'))
+NeoBundle 'Shougo/neocomplete.vim'
+NeoBundle 'scrooloose/syntastic'
+NeoBundle 'w0ng/vim-hybrid'
+NeoBundle 'nathanaelkane/vim-indent-guides'
+NeoBundle 'Townk/vim-autoclose'
+NeoBundle 'stephpy/vim-yaml'
+NeoBundle 'chase/vim-ansible-yaml'
+NeoBundle 'davidhalter/jedi-vim'
+call neobundle#end()
+NeoBundleCheck
+
+set ignorecase          " 大文字小文字を区別しない
+set smartcase           " 検索文字に大文字がある場合は大文字小文字を区別
+set incsearch           " インクリメンタルサーチ
+set hlsearch            " 検索マッチテキストをハイライト (2013-07-03 14:30 修正）
+set number              " 行番号の表示
+set wrap                " 長いテキストの折り返し
+set textwidth=0         " 自動的に改行が入るのを無効化
+set colorcolumn=80      " その代わり80文字目にラインを入れる
+"
+"" バックスラッシュやクエスチョンを状況に合わせ自動的にエスケープ
+cnoremap <expr> / getcmdtype() == '/' ? '\/' : '/'
+cnoremap <expr> ? getcmdtype() == '?' ? '\?' : '?'
+
+filetype plugin indent on
+
+let g:syntastic_enable_signs=1
+let g:syntastic_auto_loc_list=2
+let g:ansible_options = {'ignore_blank_lines': 0}
+set t_Co=256
+colorscheme hybrid
+
+" vim-indent-guides
+let g:indent_guides_auto_colors=0
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=#444433 ctermbg=black
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=#333344 ctermbg=darkgray
+let g:indent_guides_enable_on_vim_startup=1
+let g:indent_guides_guide_size=1
+						   
+" for python, javascript, indent
+autocmd FileType python,yml,yaml setlocal shiftwidth=2 softtabstop=2 tabstop=2 expandtab
+autocmd FileType python setlocal completeopt-=preview
+let s:hooks = neobundle#get_hooks("jedi-vim")
+function! s:hooks.on_source(bundle)
+	let g:jedi#auto_vim_configuration = 0
+	let g:jedi#popup_select_first = 0
+endfunction
+"------------------------------------------------------------
+"" jedi-vim Setting
+autocmd FileType python setlocal omnifunc=jedi#completions
+let g:jedi#popup_select_first=0
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+let g:neocomplete#force_omni_input_patterns.python = '\%([^."\t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+"------------------------------------------------------------
